@@ -183,7 +183,6 @@ const buildSemverMap = (files) => {
 const getSharedAttributes = (fileData, hierarchy, semverMap) => {
   
   const pathParts = fileData.path.split(sep)
-  console.log("fileData.paths: "+pathParts);
   let record = {};
 
   if (pathParts[0] === 'test') {

@@ -146,7 +146,6 @@ function plugin(opts) {
     }
     var xPath = function(path) {
       // change path separator from platform specific to '/'
-      //console.log('osPath:'+path);
       var parts = path.split(sep);
       var xPath = '';
       for(i in parts){
@@ -156,7 +155,6 @@ function plugin(opts) {
           xPath += '/'; 
         }
       }
-      //console.log('xPath:'+xPath);
       return xPath;
     }
     let r = {
