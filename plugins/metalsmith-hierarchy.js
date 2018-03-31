@@ -1,4 +1,5 @@
 const path = require('path');
+const sep = require('path').sep;
 const cheerio = require('cheerio');
 const md = require('markdown-it')({
   typographer: true,
@@ -9,8 +10,8 @@ const decoder = new StringDecoder('utf8');
 
 function walk(opts, file, files, array, children, level) {
   // Get path
-  let pathParts = file.split('/');
-  pathParts.pop()
+  let pathParts = file.split(sep);
+  pathParts.pop();
   let urlPath = '/' + pathParts.join('/');
   if(!level) {
     level = 0;
@@ -73,12 +74,13 @@ function plugin(opts) {
   return function(files, metalsmith, done) {
     setImmediate(done);
     var findByPath = function(path) {
+      path = this.xPath(path);
       if(path[0] !== '/') {
         path = '/' + path;
       }
       // Check if exists
       let listOfPaths = Object.keys(files).map(f => {
-        let array = f.split('/');
+        let array = f.split(sep);
         array.pop();
         return '/' + array.join('/');
       });
@@ -123,6 +125,7 @@ function plugin(opts) {
       return found;
     }
     var findParent = function(path, key, value) {
+      path = this.xPath(path);
       if(path[0] !== '/') {
         path = '/' + path;
       }
@@ -140,7 +143,21 @@ function plugin(opts) {
         }
       }, this);
       return parent;
-
+    }
+    var xPath = function(path) {
+      // change path separator from platform specific to '/'
+      //console.log('osPath:'+path);
+      var parts = path.split(sep);
+      var xPath = '';
+      for(i in parts){
+        var xParts = parts[i].split('/');
+        xPath += xParts.join('/');
+        if(i < parts.length-1){
+          xPath += '/'; 
+        }
+      }
+      //console.log('xPath:'+xPath);
+      return xPath;
     }
     let r = {
       id: '',
@@ -150,9 +167,10 @@ function plugin(opts) {
       findByPath: findByPath,
       findParent: findParent,
       find: find,
+      xPath: xPath,
     };
     Object.keys(files).forEach(function(file, index) {
-      var pathParts = file.split('/');
+      var pathParts = file.split(sep);
       pathParts.pop();
       let children = walk(opts, file, files, pathParts, r.children, 0);
       r.children = children;
